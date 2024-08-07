@@ -37,10 +37,11 @@ This can be done using "pip install -r requirements.txt" in a terminal.
      - On Windows: set GOOGLE_APPLICATION_CREDENTIALS=path\to\your\service-account-file.json
      - On macOS/Linux: export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/service-account-file.json
 5. Update the config.py file included so that it matches your settings for the PI key, Google Cloud Storage bucket, and BigQuery datasets/tables.
+- config.py is also the file that contains locations used
 
 **How to use the script:**
 
-After setting up the environment, run the Main.py file to execute the entire pipeline:
+After setting up the environment, run the Main.py file to execute the entire pipeline.
 
 **Screenshots**
 I will provide screenshots of a successful run in a folder on my GitHub project (If it's not done yet, it will be fixed eventually)

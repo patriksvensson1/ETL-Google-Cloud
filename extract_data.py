@@ -21,10 +21,7 @@ def run():
         print(f"Error: {error}")
         return
 
-    print("This is a Python script that gets data from locations entered by the user.")
-    print("To get data from multiple locations, separate them by using a comma.")
-    user_input = input("Enter location name: ")
-    location_names = user_input.split(',')
+    location_names = [location.strip() for location in config.LOCATIONS.split(',')]
 
     all_locations = []
     for name in location_names:

@@ -3,6 +3,9 @@ from google.cloud import storage, bigquery
 from google.oauth2 import service_account
 from datetime import datetime
 
+# Locations used in the script (multiple cities separated by comma)
+LOCATIONS = "Stockholm, London, Paris, Tokyo, New York"
+
 # datetime for file generation and BigQuery:
 TIME_NOW = datetime.now()
 DATE = TIME_NOW.strftime("%Y-%m-%d")
