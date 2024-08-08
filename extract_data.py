@@ -14,13 +14,28 @@ geolocator = Nominatim(user_agent="weather_script")
 
 
 def run():
-    print("---------- Running extract_data.py ----------")
     try:
-        check_environment_variables()
-    except (ValueError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        return
+        print("---------- Running extract_data.py ----------")
+        all_locations = get_locations()
 
+        if not all_locations:
+            print("No valid locations were entered.")
+            return
+
+        weather_data_list = get_weather_data(all_locations)
+
+        if not weather_data_list:
+            print("No weather data was retrieved.")
+            return
+
+        create_local_file(weather_data_list)
+        upload_file_to_gcs()
+        remove_local_file()
+    except Exception as error:
+        print(f'Error: {error}')
+
+
+def get_locations():
     location_names = [location.strip() for location in config.LOCATIONS.split(',')]
 
     all_locations = []
@@ -32,30 +47,7 @@ def run():
         else:
             all_locations.append((location.longitude, location.latitude, name))
 
-    if not all_locations:
-        print("No valid locations were entered.")
-        return
-
-    weather_data_list = get_weather_data(all_locations)
-
-    if not weather_data_list:
-        print("No weather data was retrieved.")
-        return
-
-    create_file(weather_data_list)
-    upload_to_gcs()
-
-
-def check_environment_variables():
-    if not config.API:
-        raise ValueError("Environment variable 'API_KEY' is not set or is empty.")
-
-    if not config.CREDENTIALS_PATH:
-        raise ValueError("Environment variable 'GOOGLE_APPLICATION_CREDENTIALS' is not set or is empty.")
-
-    if not os.path.isfile(config.CREDENTIALS_PATH):
-        raise FileNotFoundError(
-            f"The file specified by 'GOOGLE_APPLICATION_CREDENTIALS' does not exist: {config.CREDENTIALS_PATH}")
+    return all_locations
 
 
 def get_weather_data(locations):
@@ -94,7 +86,7 @@ def extract_weather_data(weather_data, location_name):
     }
 
 
-def create_file(weather_data_list):
+def create_local_file(weather_data_list):
     # Creates a local .csv file with the data from the API
     try:
         with open(config.FILENAME, 'w', newline='') as file:
@@ -106,13 +98,13 @@ def create_file(weather_data_list):
             for weather_data in weather_data_list:
                 writer.writerow(weather_data)
 
-        print(f"{config.FILENAME} was created.")
+        print(f"Local file {config.FILENAME} was created.")
 
     except IOError as e:
         print(f"File I/O error: {e}")
 
 
-def upload_to_gcs():
+def upload_file_to_gcs():
     # Uploads the file to Google Cloud Storage
     try:
         config.GCS_BLOB.upload_from_filename(config.FILENAME)
@@ -120,3 +112,8 @@ def upload_to_gcs():
 
     except Exception as e:
         print(f"Error uploading to Google Cloud Storage: {e}")
+
+
+def remove_local_file():
+    os.remove(config.FILENAME)
+    print(f"Local file {config.FILENAME} has been deleted.")

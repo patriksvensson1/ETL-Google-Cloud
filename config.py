@@ -3,7 +3,7 @@ from google.cloud import storage, bigquery
 from google.oauth2 import service_account
 from datetime import datetime
 
-# Locations used in the script (multiple cities separated by comma)
+# Locations used in the script, change if needed (multiple cities separated by comma)
 LOCATIONS = "Stockholm, London, Paris, Tokyo, New York"
 
 # datetime for file generation and BigQuery:
@@ -25,7 +25,8 @@ CREDENTIALS = service_account.Credentials.from_service_account_file(CREDENTIALS_
 # Google Cloud Storage settings:
 STORAGE_CLIENT = storage.Client(credentials=CREDENTIALS)
 GCS_BUCKET = STORAGE_CLIENT.bucket('your_bucket_name_here')
-GCS_BLOB = GCS_BUCKET.blob(f'eventual_folder_if_needed/{FILENAME}')
+GCS_BLOB = GCS_BUCKET.blob(f'eventual_folder/{FILENAME}')  # Set folder if needed
+GCS_BLOB_ARCHIVE = GCS_BUCKET.blob(f'eventual_folder/archive/{FILENAME}')
 GCS_URI = f'gs://{GCS_BUCKET.name}/{GCS_BLOB.name}'
 
 # Google BigQuery settings:

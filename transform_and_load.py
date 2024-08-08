@@ -6,25 +6,13 @@ import config
 def run():
     print("---------- Running transform_and_load.py ----------")
     try:
-        check_environment_variables()
-    except (ValueError, FileNotFoundError) as error:
+        load_to_staging_table()
+        archive_gcs_blob()
+        load_to_cleaned_table()
+        clear_staging_table()
+    except Exception as error:
         print(f"Error: {error}")
         return
-
-    load_to_staging_table()
-    load_to_cleaned_table()
-
-
-def check_environment_variables():
-    if not config.API:
-        raise ValueError("Environment variable 'API_KEY' is not set or is empty.")
-
-    if not config.CREDENTIALS_PATH:
-        raise ValueError("Environment variable 'GOOGLE_APPLICATION_CREDENTIALS' is not set or is empty.")
-
-    if not os.path.isfile(config.CREDENTIALS_PATH):
-        raise FileNotFoundError(
-            f"The file specified by 'GOOGLE_APPLICATION_CREDENTIALS' does not exist: {config.CREDENTIALS_PATH}")
 
 
 def load_to_staging_table():
@@ -45,6 +33,15 @@ def load_to_staging_table():
         print(f"Loaded data into {config.BQ_STAGING_DATASET_ID}.{config.BQ_STAGING_TABLE_ID}.")
     except Exception as error:
         print(f"Error loading data into BigQuery staging table: {error}")
+
+
+def archive_gcs_blob():
+    try:
+        config.GCS_BUCKET.copy_blob(config.GCS_BLOB, config.GCS_BUCKET, config.GCS_BLOB_ARCHIVE.name)
+        config.GCS_BLOB.delete()
+        print(f'Archived blob to {config.GCS_BLOB_ARCHIVE.name}.')
+    except Exception as error:
+        print(f'Error archiving the blob: {error}')
 
 
 def load_to_cleaned_table():
@@ -82,3 +79,15 @@ def load_to_cleaned_table():
         print(f'Loaded data into cleaned table {config.BQ_CLEANED_DATASET_ID}.{config.BQ_CLEANED_TABLE_ID}.')
     except Exception as error:
         print(f"Error loading data into BigQuery cleaned table: {error}")
+
+
+def clear_staging_table():
+    try:
+        sql = f'''
+         TRUNCATE TABLE {config.BQ_STAGING_DATASET_ID}.{config.BQ_STAGING_TABLE_ID}
+        '''
+        query_job = config.BQ_CLIENT.query(sql)
+        query_job.result()
+        print(f'Cleared the staging table {config.BQ_STAGING_DATASET_ID}.{config.BQ_STAGING_TABLE_ID}.')
+    except Exception as error:
+        print(f"Error clearing the staging table: {error}")

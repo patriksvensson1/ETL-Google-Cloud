@@ -44,4 +44,4 @@ This can be done using "pip install -r requirements.txt" in a terminal.
 After setting up the environment, run the Main.py file to execute the entire pipeline.
 
 **Screenshots**
-I will provide screenshots of a successful run in a folder on my GitHub project (If it's not done yet, it will be fixed eventually)
+Screenshots of a successful run can be found in the folder "demo screenshots"
