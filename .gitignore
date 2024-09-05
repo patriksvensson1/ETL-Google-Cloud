@@ -1,0 +1,15 @@
+# Ignore virtual environment folder (like venv)
+venv/
+
+# Ignore PyCharm/IntelliJ specific files
+.idea/
+
+# Ignore Python bytecode files
+__pycache__/
+
+# Ignore any compiled files
+*.pyc
+*.pyo
+
+# Ignore macOS system files
+.DS_Store

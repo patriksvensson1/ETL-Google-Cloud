@@ -27,4 +27,5 @@
 5. Update the config.py file so that it matches API, GCP settings and locations used.
 
 **How to use:**
+
 Run the Main.py file to execute the entire pipeline.
